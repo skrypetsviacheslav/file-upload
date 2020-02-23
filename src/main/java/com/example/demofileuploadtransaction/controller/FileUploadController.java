@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -62,13 +63,17 @@ public class FileUploadController {
     }
 
     @PostMapping("/")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file,
+    public String handleFileUpload(@RequestParam("file") List<MultipartFile> files,
                                    RedirectAttributes redirectAttributes) {
-
-        storageService.store(file);
+        StringBuilder builder = new StringBuilder();
+        builder.append("You successfully uploaded ");
+        for (MultipartFile file : files) {
+            storageService.store(file);
+            builder.append(file.getOriginalFilename()).append(", ");
+        }
+        builder.append(" files!");
         redirectAttributes.addFlashAttribute("message",
-                "You successfully uploaded " + file.getOriginalFilename() + "!");
-
+                builder.toString());
         return "redirect:/";
     }
 
